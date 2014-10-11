@@ -1,0 +1,24 @@
+{
+  "name": "fume",
+  "version": "0.0.0",
+  "description": "Use factories to fabricate AMD and CommonJS modules",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/EyalAr/fume.git"
+  },
+  "keywords": [],
+  "author": "Eyal Arubas <eyalarubas@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/EyalAr/fume/issues"
+  },
+  "homepage": "https://github.com/EyalAr/fume",
+  "dependencies": {
+    "escodegen": "^1.4.1",
+    "esprima": "^1.2.2"
+  }
+}
