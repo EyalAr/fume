@@ -48,24 +48,24 @@ You can use the CLI in two modes:
 
 ## Source annotations
 
-Annotation are specified in a comment right before the factory function.
+Annotations are specified in a comment right before the factory function.
 
 ### Factory name
 
 **Annotation:** `@name`
 
-Sets the name of this factory, which will be used to resolve dependencies.
+Sets the name of the factory. Will be used to resolve dependencies.
 
 **Example:**
 
-*`foo.module.js`*:
+*foo.module.js*:
 
 ```Javascript
 /* @name foo */
 function factory(bar){ /* ... */ }
 ```
 
-*`bar.module.js`*:
+*bar.module.js*:
 
 ```Javascript
 /* @name bar */
@@ -88,7 +88,7 @@ Specify which dependency to use in case of ambiguity.
 
 **Example:**
 
-*`foo.js`*:
+*foo.js*:
 
 ```Javascript
 /**
@@ -98,14 +98,14 @@ Specify which dependency to use in case of ambiguity.
 function factory(bar){ /* ... */ }
 ```
 
-*`bar-1.0/bar.js`*:
+*bar-1.0/bar.js*:
 
 ```Javascript
 /* @name bar */
 function factory(){ /* ... */ }
 ```
 
-*`bar-2.0/bar.js`*:
+*bar-2.0/bar.js*:
 
 ```Javascript
 /* @name bar */
