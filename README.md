@@ -123,64 +123,45 @@ define(['./bar-1.0/bar'], function factory(bar) {
 });
 ```
 
-## Example
+### Specify AMD / CJS dependency
 
-Let's say we are developing a library `foo`. This library has two dependencies:
+**Annotation:** `@amd`, `@cjs`
 
-0. `bar` - a sub module we write as part of our library.
-0. [`lodash`](https://github.com/lodash/lodash/)
+Specify how a dependency should be located when your factory is generated as an
+AMD module or as a CJS module.
 
-We want to distribute our library both as an AMD module and as a CommonJS
-module.
+**Example:**
 
-`lodash` has different distributions for AMD and CJS. As an AMD module we need
-to depend on [`lodash-amd`](https://github.com/lodash/lodash-amd) ('modern'
-flavor), and as a CJS module we want to depend on
-[`lodash-node`](https://github.com/lodash/lodash-node).
-
-When writing our module, we shouldn't care about where to retrieve the
-dependency from. We just want to declare what we need:
-`function factory(lodash, bar){ /* ... */ }`
-
-When distributing our module the dependencies should be mapped to the correct
-location. `lodash` should be mapped to either `lodash-amd` or `lodash-node`,
-and `bar` should be mapped to `./bar`.
-
-We annotate our code as follows:
-
-**foo.js**
+*foo.js*:
 
 ```Javascript
 /**
  * @name foo
- * @amd lodash ../../lodash-amd/modern
- * @cjs lodash lodash-node
+ * @amd $ jquery
+ * @cjs $ jquery
+ * @amd _ lodash-amd
+ * @cjs _ lodash-node
  */
-function factory(lodash, bar){
-    return function(){
-        // use lodash...
-        // use foo...
-    }
-}
+function factory($, _){ /* ... */ }
 ```
- 
-The output of `fume foo.js -d bar.js --amdify` will be:
 
- ```Javascript
- define([
-    '../../lodash-amd/modern',
-    './bar'
-], function factory(lodash, bar) {
-    return function () {
-    };
+Generated AMD module for `foo`:
+
+```Javascript
+define([
+    'jquery',
+    'lodash-amd'
+], function factory($, _) {
+    /* ... */
 });
- ```
+```
 
-The output of `fume foo.js -d bar.js --cjsify` will be:
+Generated CJS module for `foo`:
 
- ```Javascript
-module.exports = function factory(lodash, bar) {
-    return function () {
-    };
-}(require('lodash-node'), require('./bar'));
- ```
+```Javascript
+module.exports = function factory($, _) {
+    /* ... */
+}(require('jquery'), require('lodash-node'));
+```
+
+**Notice** how the lodash dependency `_` is located differently for CJS and AMD.
