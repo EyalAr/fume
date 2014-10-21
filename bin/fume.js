@@ -15,18 +15,19 @@ var nopt = require("nopt"),
     },
     parsed = nopt(opts, {}, process.argv, 2),
     USAGE = [
-        "fume [input(s)] -s [path] -s [path] ... --amdify --cjsify",
+        "fume [input(s)] -s [path] -s [path] ... --amdify --cjsify --umdify",
         "\t[input]: Input file path(s)",
         "\t-s (--sibling): Path of a sibling factory",
         "\t-a (--amdify): generate an AMD module",
         "\t-c (--cjsify): generate a CJS module",
+        "\t-a (--umdify): generate a UMD module",
         "\t-o (--out): output directory (optional if input is one file)",
     ].join("\n"),
     siblings = parsed.sibling || [],
     input = parsed.argv.remain,
     outDir = parsed.out,
     files = Array.prototype.concat.apply(input, siblings).map(
-        function(fpath) {
+        function (fpath) {
             return path.normalize(
                 path.join(
                     process.cwd(),
@@ -43,18 +44,18 @@ if (input.length < 1)
     usage("Missing input", 1);
 if (input.length > 1 && !outDir)
     usage("Please specify an output directory", 1);
-if (!(parsed.amdify || parsed.cjsify))
-    usage("Choose either AMD output or CJS output", 1);
-if (parsed.amdify && parsed.cjsify)
-    usage("Choose either AMD output or CJS output, but not both", 1);
+if (!(parsed.amdify || parsed.cjsify || parsed.umdify))
+    usage("Choose either AMD, CJS or UMD output", 1);
+if (parsed.amdify + parsed.cjsify + parsed.umdify > 1)
+    usage("Choose either one type of output (AMD, CJS or UMD)", 1);
 
 async.waterfall([
 
     // make sure no directories in the input list
-    function(next) {
+    function (next) {
 
-        async.each(input, function(path, done) {
-            fs.stat(path, function(err, stats) {
+        async.each(input, function (path, done) {
+            fs.stat(path, function (err, stats) {
                 if (err) return done(err);
                 if (stats.isDirectory())
                     return done("Cannot have a directory as input");
@@ -65,10 +66,10 @@ async.waterfall([
     },
 
     // make sure no directories in the siblings list
-    function(next) {
+    function (next) {
 
-        async.each(siblings, function(path, done) {
-            fs.stat(path, function(err, stats) {
+        async.each(siblings, function (path, done) {
+            fs.stat(path, function (err, stats) {
                 if (err) return done(err);
                 if (stats.isDirectory())
                     return done("Cannot have a directory as a sibling");
@@ -79,18 +80,18 @@ async.waterfall([
     },
 
     // fume files
-    function(next) {
+    function (next) {
 
-        async.map(files, function(path, done) {
+        async.map(files, function (path, done) {
             fs.readFile(path, {
                 encoding: 'utf8'
-            }, function(err, data) {
+            }, function (err, data) {
                 done(err, {
                     path: path,
                     code: data
                 });
             });
-        }, function(err, codes) {
+        }, function (err, codes) {
             if (err) return next(err);
             try {
                 next(null, fume(codes));
@@ -102,22 +103,30 @@ async.waterfall([
     },
 
     // print results
-    function(sources, next) {
+    function (sources, next) {
 
         if (input.length === 1 && !outDir) {
-            return setImmediate(function() {
+            return setImmediate(function () {
                 console.log(
-                    sources[files[0]][parsed.amdify ? 'amdify' : 'cjsify']()
+                    sources[files[0]][
+                        parsed.amdify ? 'amdify' :
+                            parsed.cjsify ? 'cjsify' :
+                                'umdify'
+                        ]()
                 );
                 next();
             });
         }
 
-        async.each(files.slice(0, input.length), function(file, done) {
+        async.each(files.slice(0, input.length), function (file, done) {
             var code, outPath, sourceBase;
 
             try {
-                code = sources[file][parsed.amdify ? 'amdify' : 'cjsify']();
+                code = sources[file][
+                    parsed.amdify ? 'amdify' :
+                        parsed.cjsify ? 'cjsify' :
+                            'umdify'
+                    ]();
             } catch (err) {
                 done(err);
             }
@@ -139,7 +148,7 @@ async.waterfall([
                 )
             );
 
-            mkdirp(outPath, function(err) {
+            mkdirp(outPath, function (err) {
                 if (err) return done(err);
                 fs.writeFile(
                     path.join(
@@ -155,7 +164,7 @@ async.waterfall([
 
     }
 
-], function(err) {
+], function (err) {
 
     if (err) {
         console.error(err);
