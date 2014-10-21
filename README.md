@@ -1,6 +1,8 @@
+[![Version](http://img.shields.io/npm/v/fume.svg)](https://www.npmjs.org/package/fume)
+
 # Fume
 
-Use factories to fabricate AMD and CommonJS modules.
+Use factories to fabricate AMD, CommonJS and UMD modules.
 
 ## Overview
 
@@ -11,7 +13,7 @@ Fume is a code generation tool which allows you to:
 0. Manual dependencies mappings and annotations in your source code.
 
 Write your code inside factory functions which receive dependencies as a list
-of arguments. Fume will use your factories to generate AMD and CJS compatible
+of arguments. Fume will use your factories to generate AMD, CJS and UMD compatible
 modules.
 
 Fume will try to auto-magically detect inter-factory dependencies in your files.
@@ -24,12 +26,13 @@ Install with `npm install -g fume`
 `require('fume')` for programmatic usage, or use the CLI tool:
 
 ```bash
-fume [input(s)] -s [path] -s [path] ... --amdify --cjsify
-    [input]: Input file path(s)
-    -s (--sibling): Path of a sibling factory
-    -a (--amdify): generate an AMD module
-    -c (--cjsify): generate a CJS module
-    -o (--out): output directory (optional if input is one file)
+fume [input(s)] -s [path] -s [path] ... --amdify --cjsify --umdify
+        [input]: Input file path(s)
+        -s (--sibling): Path of a sibling factory
+        -a (--amdify): generate an AMD module
+        -c (--cjsify): generate a CJS module
+        -a (--umdify): generate a UMD module
+        -o (--out): output directory (optional if input is one file)
 ```
 
 You can use the CLI in two modes:
